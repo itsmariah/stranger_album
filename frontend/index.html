@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stranger Album - Hawkins Edition</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <!-- Style -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Sound Control -->
+    <button id="sound-toggle" class="sound-btn" aria-label="Alternar som">
+        <svg class="sound-icon-on" viewBox="0 0 24 24" width="24" height="24">
+            <path fill="currentColor"
+                d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z" />
+        </svg>
+        <svg class="sound-icon-off hidden" viewBox="0 0 24 24" width="24" height="24">
+            <path fill="currentColor"
+                d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.5C15.58,18 14.83,18.4 14,18.71V20.77C15.38,20.44 16.63,19.78 17.7,18.9L20.73,21.93L22,20.66L4.27,3M14,3.23V5.29C14.73,5.5 15.43,5.83 16.07,6.26L14.59,7.74C14.41,7.65 14.21,7.58 14,7.54V9.54L19,14.54C19,13.7 19,12.85 19,12C19,7.72 16,4.14 14,3.23M16.5,12C16.5,11.2 16.1,10.5 15.5,10.05L14,11.55V12.45L15.46,13.9C15.48,13.28 16.5,12.62 16.5,12Z" />
+        </svg>
+    </button>
+
+    <!-- Pack / Progress Controls -->
+    <div class="pack-controls hidden" id="pack-controls">
+        <span class="progress-badge" id="progress-badge">0/30</span>
+        <button id="btn-pack" class="pack-btn" disabled>
+            <svg viewBox="0 0 24 24" width="18" height="18">
+                <path fill="currentColor"
+                    d="M12,2L1,7L12,12L23,7L12,2M1,17L12,22L23,17M1,12L12,17L23,12" />
+            </svg>
+            <span class="pack-btn-label">Abrir Pacote</span>
+        </button>
+        <button id="btn-reset" class="reset-link" aria-label="Reiniciar coleção" title="Reiniciar coleção">
+            <svg viewBox="0 0 24 24" width="16" height="16">
+                <path fill="currentColor"
+                    d="M12,4C14.1,4 16.1,4.8 17.6,6.3C20.7,9.4 20.7,14.5 17.6,17.6C15.8,19.5 13.3,20.2 10.9,19.9L11.4,17.9C13.1,18.1 14.9,17.5 16.2,16.2C18.5,13.9 18.5,10.1 16.2,7.7C15.1,6.6 13.5,6 12,6V10.6L7,5.6L12,0.6V4M6.3,17.6C3.7,15 3.3,11 5.1,7.9L6.6,9.4C5.5,11.6 5.9,14.4 7.8,16.2C8.3,16.7 8.9,17.1 9.6,17.4L9,19.4C8,19 7.1,18.4 6.3,17.6Z" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Error Banner -->
+    <div class="error-banner hidden" id="error-banner" role="alert">
+        <span id="error-banner-text"></span>
+        <button id="error-banner-retry" class="error-banner-retry">Tentar novamente</button>
+        <button id="error-banner-close" class="error-banner-close" aria-label="Fechar aviso">&times;</button>
+    </div>
+
+    <!-- Navigation Arrows -->
+    <button id="btn-prev" class="nav-btn nav-btn-left" aria-label="Página Anterior">
+        <svg viewBox="0 0 24 24" width="36" height="36">
+            <path fill="currentColor" d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" />
+        </svg>
+    </button>
+    <button id="btn-next" class="nav-btn nav-btn-right" aria-label="Próxima Página">
+        <svg viewBox="0 0 24 24" width="36" height="36">
+            <path fill="currentColor" d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
+        </svg>
+    </button>
+
+    <!-- Album Container -->
+    <div class="album-viewport" id="album-viewport">
+        <div class="flip-book" id="book">
+
+            <!-- PAGINA 0: CAPA -->
+            <div class="page page-cover" data-density="hard">
+                <div class="page-content cover-content">
+                    <div class="cover-header">
+                        <span class="cover-seal">COLEÇÃO OFICIAL</span>
+                    </div>
+                    <div class="cover-body">
+                        <h1 class="cover-title glitch" data-text="STRANGER">STRANGER</h1>
+                        <h2 class="cover-subtitle glitch" data-text="ALBUM">ALBUM</h2>
+                        <div class="cover-art">
+                            <div class="art-grid"></div>
+
+                            <!-- Floating Mini Cards Silhouette Collage -->
+                            <div class="mini-card mc-turing">
+                                <div class="mc-avatar">MK</div>
+                                <span class="mc-num">#01</span>
+                            </div>
+                            <div class="mini-card mc-guido">
+                                <div class="mc-avatar">EL</div>
+                                <span class="mc-num">#03</span>
+                            </div>
+                            <div class="mini-card mc-jobs">
+                                <div class="mc-avatar">ST</div>
+                                <span class="mc-num">#09</span>
+                            </div>
+
+                            <!-- Central Glowing 3D Tech Sphere -->
+                            <div class="tech-sphere">
+                                <div class="sphere-core">
+                                    <svg class="art-logo" viewBox="0 0 24 24">
+                                        <path fill="currentColor"
+                                            d="M2 3h20c1.1 0 2 .9 2 2v14c0 1.1-.9 2-2 2H2c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2m2 3v4h16V6H4m2 6v4h12v-4H6m2 1h2v2H8v-2m6 0h2v2h-2v-2z" />
+                                    </svg>
+                                </div>
+                                <div class="sphere-ring ring-1"></div>
+                                <div class="sphere-ring ring-2"></div>
+                            </div>
+                        </div>
+                        <p class="cover-footer-text">MISTÉRIOS, MONSTROS E AMIZADE NO MUNDO INVERTIDO</p>
+                    </div>
+                    <div class="cover-footer">
+                        <span>2026 HAWKINS EDITION</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGINA 1: THE PARTY -->
+            <div class="page page-left">
+                <div class="page-content">
+                    <div class="page-header">
+                        <span class="tech-badge badge-ia">THE PARTY</span>
+                        <h3 class="page-title">O Grupo de Hawkins</h3>
+                    </div>
+                    <div class="stickers-grid">
+                        <div class="sticker-slot">
+                            <div class="slot-number">#01</div>
+                            <div class="slot-name">Mike Wheeler</div>
+                            <div class="slot-role">Líder do grupo de amigos e protetor de Eleven</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#02</div>
+                            <div class="slot-name">Dustin Henderson</div>
+                            <div class="slot-role">O cérebro tecnológico e cômico do grupo</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#03</div>
+                            <div class="slot-name">Eleven</div>
+                            <div class="slot-role">A garota com incríveis poderes telecinéticos</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#04</div>
+                            <div class="slot-name">Will Byers</div>
+                            <div class="slot-role">O garoto desaparecido e conexão com o Outro Lado</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#05</div>
+                            <div class="slot-name">Lucas Sinclair</div>
+                            <div class="slot-role">O pragmático e defensor do grupo</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#06</div>
+                            <div class="slot-name">Max Mayfield</div>
+                            <div class="slot-role">A skatista destemida e corajosa do grupo</div>
+                        </div>
+                    </div>
+                    <div class="page-footer">Pág. 1</div>
+                </div>
+            </div>
+
+            <!-- PAGINA 2: THE TEENS -->
+            <div class="page page-right">
+                <div class="page-content">
+                    <div class="page-header">
+                        <span class="tech-badge badge-python">THE TEENS</span>
+                        <h3 class="page-title">Adolescentes de Hawkins</h3>
+                    </div>
+                    <div class="stickers-grid">
+                        <div class="sticker-slot">
+                            <div class="slot-number">#07</div>
+                            <div class="slot-name">Nancy Wheeler</div>
+                            <div class="slot-role">Investigadora obstinada e exímia atiradora</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#08</div>
+                            <div class="slot-name">Jonathan Byers</div>
+                            <div class="slot-role">Fotógrafo e irmão protetor de Will</div>
+                        </div>
+                        <div class="sticker-slot special-slot">
+                            <div class="slot-number">#09</div>
+                            <div class="slot-name">Steve Harrington</div>
+                            <div class="slot-role">O babá favorito com seu taco de beisebol com pregos</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#10</div>
+                            <div class="slot-name">Robin Buckley</div>
+                            <div class="slot-role">A decifradora de códigos inteligente e carismática</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#11</div>
+                            <div class="slot-name">Eddie Munson</div>
+                            <div class="slot-role">Líder do Hellfire Club e mestre do D&D</div>
+                        </div>
+                    </div>
+                    <div class="page-footer">Pág. 2</div>
+                </div>
+            </div>
+
+            <!-- PAGINA 3: THE ADULTS -->
+            <div class="page page-left">
+                <div class="page-content">
+                    <div class="page-header">
+                        <span class="tech-badge badge-db">THE ADULTS</span>
+                        <h3 class="page-title">Adultos e Protetores</h3>
+                    </div>
+                    <div class="stickers-grid">
+                        <div class="sticker-slot">
+                            <div class="slot-number">#12</div>
+                            <div class="slot-name">Joyce Byers</div>
+                            <div class="slot-role">A mãe determinada que faria tudo por seus filhos</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#13</div>
+                            <div class="slot-name">Jim Hopper</div>
+                            <div class="slot-role">O xerife de Hawkins de grande coração e coragem</div>
+                        </div>
+                        <div class="sticker-slot special-slot">
+                            <div class="slot-number">#14</div>
+                            <div class="slot-name">Murray Bauman</div>
+                            <div class="slot-role">O jornalista conspiracionista e excêntrico</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#15</div>
+                            <div class="slot-name">Bob Newby</div>
+                            <div class="slot-role">O herói nerd que salvou o grupo no laboratório</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#16</div>
+                            <div class="slot-name">Karen Wheeler</div>
+                            <div class="slot-role">A mãe de Mike, sempre preocupada com a segurança dos filhos</div>
+                        </div>
+
+                    </div>
+                    <div class="page-footer">Pág. 3</div>
+                </div>
+            </div>
+
+            <!-- PAGINA 4: MONSTERS -->
+            <div class="page page-right">
+                <div class="page-content">
+                    <div class="page-header">
+                        <span class="tech-badge badge-os">MONSTERS</span>
+                        <h3 class="page-title">Ameaças do Mundo Invertido</h3>
+                    </div>
+                    <div class="stickers-grid">
+                        <div class="sticker-slot">
+                            <div class="slot-number">#17</div>
+                            <div class="slot-name">Demogorgon</div>
+                            <div class="slot-role">O predador humanoide original do Upside Down</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#18</div>
+                            <div class="slot-name">Demodogs</div>
+                            <div class="slot-role">Estágio jovem e quadrúpede dos Demogorgons</div>
+                        </div>
+                        <div class="sticker-slot special-slot">
+                            <div class="slot-number">#19</div>
+                            <div class="slot-name">Mind Flayer</div>
+                            <div class="slot-role">A entidade sombria que comanda o Upside Down</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#20</div>
+                            <div class="slot-name">Vecna</div>
+                            <div class="slot-role">Henry Creel, o arquiteto sombrio e final boss</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#21</div>
+                            <div class="slot-name">Demobats</div>
+                            <div class="slot-role">Morcegos carnívoros e barulhentos do Upside Down</div>
+                        </div>
+                    </div>
+                    <div class="page-footer">Pág. 4</div>
+                </div>
+            </div>
+
+            <!-- PAGINA 5: HAWKINS VOL 1 -->
+            <div class="page page-left">
+                <div class="page-content">
+                    <div class="page-header">
+                        <span class="tech-badge badge-brasil">HAWKINS</span>
+                        <h3 class="page-title">Mistérios e Cenários - Vol. 1</h3>
+                    </div>
+                    <div class="stickers-grid">
+                        <div class="sticker-slot">
+                            <div class="slot-number">#22</div>
+                            <div class="slot-name">Laboratório de Hawkins</div>
+                            <div class="slot-role">Onde Eleven foi criada e os portais se abriram</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#23</div>
+                            <div class="slot-name">O Porão dos Wheeler</div>
+                            <div class="slot-role">O quartel-general de D&D e planos do grupo</div>
+                        </div>
+                        <div class="sticker-slot special-slot">
+                            <div class="slot-number">#24</div>
+                            <div class="slot-name">Starcourt Mall</div>
+                            <div class="slot-role">O shopping que escondia uma base russa secreta</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#25</div>
+                            <div class="slot-name">Floresta Mirkwood</div>
+                            <div class="slot-role">O trecho de mata onde Will Byers desapareceu</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#26</div>
+                            <div class="slot-name">Casa dos Creel</div>
+                            <div class="slot-role">A mansão abandonada onde Vecna vivia no passado</div>
+                        </div>
+                    </div>
+                    <div class="page-footer">Pág. 5</div>
+                </div>
+            </div>
+
+            <!-- PAGINA 6: HAWKINS VOL 2 -->
+            <div class="page page-right">
+                <div class="page-content">
+                    <div class="page-header">
+                        <span class="tech-badge badge-brasil">HAWKINS</span>
+                        <h3 class="page-title">Mistérios e Cenários - Vol. 2</h3>
+                    </div>
+                    <div class="stickers-grid">
+                        <div class="sticker-slot">
+                            <div class="slot-number">#27</div>
+                            <div class="slot-name">Castelo Byers</div>
+                            <div class="slot-role">O forte de galhos construído por Will na floresta</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#28</div>
+                            <div class="slot-name">Parede de Luzes</div>
+                            <div class="slot-role">A comunicação de Joyce com Will via luzes de Natal</div>
+                        </div>
+                        <div class="sticker-slot special-slot">
+                            <div class="slot-number">#29</div>
+                            <div class="slot-name">Scoops Ahoy</div>
+                            <div class="slot-role">A famosa sorveteria do Starcourt Mall</div>
+                        </div>
+                        <div class="sticker-slot">
+                            <div class="slot-number">#30</div>
+                            <div class="slot-name">Palace Arcade</div>
+                            <div class="slot-role">O fliperama onde a Party passava horas jogando</div>
+                        </div>
+                        <div class="sticker-slot user-slot" id="slot-31">
+                            <div class="slot-number">#31</div>
+                            <div class="slot-name">Você</div>
+                            <div class="slot-role">Seja bem-vindo a Hawkins! Clique para colar sua foto.</div>
+                        </div>
+                    </div>
+                    <div class="page-footer">Pág. 6</div>
+                </div>
+            </div>
+
+            <!-- PAGINA 7: CONTRACAPA -->
+            <div class="page page-cover-back" data-density="hard">
+                <div class="page-content cover-back-content">
+                    <div class="cover-back-header">
+                        <h2>STRANGER ALBUM</h2>
+                    </div>
+                    <div class="cover-back-body">
+                        <div class="tech-logo-collage">
+                            <span>THE PARTY</span> • <span>THE TEENS</span> • <span>THE ADULTS</span> •
+                            <span>MONSTERS</span> • <span>HAWKINS</span>
+                        </div>
+                        <p class="summary-text">
+                            O Stranger Album é uma homenagem interativa aos mistérios da pacata cidade de Hawkins e às
+                            terríveis criaturas do Mundo Invertido. Junte-se a Eleven, Mike e toda a turma nessa jornada
+                            nostálgica e sombria pelos anos 80.
+                        </p>
+                        <div class="barcode-container">
+                            <div class="barcode">
+                                <!-- Simulated barcode lines -->
+                                <div class="bar"></div>
+                                <div class="bar thin"></div>
+                                <div class="bar"></div>
+                                <div class="bar thick"></div>
+                                <div class="bar thin"></div>
+                                <div class="bar"></div>
+                                <div class="bar thick"></div>
+                                <div class="bar"></div>
+                                <div class="bar thin"></div>
+                                <div class="bar thick"></div>
+                            </div>
+                            <span class="barcode-number">9 788575 228494</span>
+                        </div>
+                    </div>
+                    <div class="cover-back-footer">
+                        <span>Hawkins Edition • Netflix Series • 2026</span>
+                        <a class="cover-back-credit" href="https://github.com/itsmariah" target="_blank" rel="noopener">
+                            <svg class="credit-icon" viewBox="0 0 24 24" width="14" height="14">
+                                <path fill="currentColor"
+                                    d="M12 2C6.48 2 2 6.58 2 12.25c0 4.54 2.87 8.38 6.84 9.73.5.1.68-.22.68-.5 0-.24-.01-1.04-.01-1.89-2.78.62-3.37-1.19-3.37-1.19-.46-1.19-1.11-1.51-1.11-1.51-.91-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.05 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.31.1-2.72 0 0 .84-.28 2.75 1.05a9.28 9.28 0 0 1 2.5-.35c.85 0 1.7.12 2.5.35 1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.46.1 2.72.64.72 1.03 1.63 1.03 2.75 0 3.92-2.34 4.79-4.57 5.04.36.32.68.94.68 1.9 0 1.37-.01 2.48-.01 2.82 0 .28.18.61.69.5A10.26 10.26 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z" />
+                            </svg>
+                            <span>@itsmariah</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Hidden input used to pick the user's own photo for slot #31 -->
+    <input type="file" id="user-photo-input" accept="image/*" class="hidden">
+
+    <!-- Page Flip Library -->
+    <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
+    <!-- Logic -->
+    <script src="app.js"></script>
+</body>
+
+</html>
