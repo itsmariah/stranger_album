@@ -26,6 +26,19 @@ O objetivo principal é construir uma interface web imersiva e responsiva que co
 
 O projeto é dividido em duas pastas: `frontend/`, com a interface interativa, e `backend/`, com a API que fornece os dados e as imagens das figurinhas.
 
+### 🗂️ Categorias do Álbum
+
+| Categoria | Página(s) | Qtd. Figurinhas | IDs | Descrição |
+|---|---|---|---|---|
+| **THE PARTY** | Pág. 1 | 6 | `#01`–`#06` | O grupo principal de Hawkins: Mike, Dustin, Eleven, Will, Lucas e Max |
+| **THE TEENS** | Pág. 2 | 5 | `#07`–`#11` | Adolescentes de Hawkins: Nancy, Jonathan, Steve, Robin e Eddie Munson |
+| **THE ADULTS** | Pág. 3 | 5 | `#12`–`#16` | Adultos e protetores: Joyce, Hopper, Murray, Bob e Karen Wheeler |
+| **MONSTERS** | Pág. 4 | 5 | `#17`–`#21` | Ameaças do Mundo Invertido: Demogorgon, Demodogs, Mind Flayer, Vecna e Demobats |
+| **HAWKINS** | Pág. 5–6 | 9 | `#22`–`#30` | Cenários e locais icônicos: Laboratório, Porão dos Wheeler, Starcourt Mall, Scoops Ahoy, entre outros |
+| **Você** | Pág. 6 | — | `#31` | Slot bônus: reservado para o usuário colar a própria foto — não faz parte do catálogo da API |
+
+**Total: 30 figurinhas colecionáveis** (sorteadas via o sistema de pacotes) **+ 1 slot pessoal**.
+
 ### 1. [index.html](frontend/index.html)
 Contém a estrutura semântica em HTML5 da aplicação.
 *   **Controles de Interface:** Botão de controle de som (ativar/desativar mute) e setas de navegação para alternar entre as páginas.
@@ -78,6 +91,33 @@ API em **FastAPI** responsável por servir os dados e as imagens das figurinhas.
 *   **Arquivos Estáticos:** Monta a pasta `backend/imgs/` na rota `/imgs`, servindo as imagens (nomeadas de `01-mike-wheeler.jpg` a `30-palace-arcade.jpg`, numeradas de acordo com o slot correspondente no álbum).
 *   **CORS:** Libera requisições de qualquer origem (`allow_origins=["*"]`) para que o frontend, rodando em uma porta diferente (ex: `http://localhost:3000`), consiga consumir a API sem bloqueios do navegador.
 
+### 🔄 Fluxo da Estrutura do Projeto
+
+```mermaid
+sequenceDiagram
+    participant U as Usuário
+    participant F as Frontend (index.html + app.js)
+    participant B as Backend (main.py - FastAPI)
+    participant I as backend/imgs/
+
+    U->>F: Abre http://localhost:3000
+    F->>F: Inicializa o St.PageFlip e monta os slots do álbum
+    F->>B: GET /figurinhas
+    B-->>F: JSON (id, nome, categoria, imagem_url)
+    F->>F: Lê o progresso salvo no localStorage
+    F->>I: GET /imgs/{id}-{nome}.jpg (para cada figurinha já coletada)
+    I-->>F: Imagem da figurinha
+    F-->>U: Álbum renderizado com o progresso atual
+
+    U->>F: Clica em "Abrir Pacote"
+    F->>F: Sorteia novos IDs ainda não coletados e salva no localStorage
+    F->>I: GET /imgs/{id}-{nome}.jpg (das novas figurinhas)
+    I-->>F: Imagem da figurinha
+    F-->>U: Figurinha aparece colada, com animação de brilho
+```
+
+Resumindo: o `index.html` monta a estrutura estática do álbum, o `app.js` busca o catálogo no backend e decide **o que mostrar** com base no progresso salvo localmente, e o `main.py` só entra em cena para fornecer os dados (`/figurinhas`) e servir as imagens (`/imgs/*.jpg`) — toda a lógica de coleção, pacotes e persistência acontece no navegador, via `localStorage`.
+
 ---
 
 ## 🛠️ Como Executar o Projeto
@@ -116,6 +156,14 @@ Para uma experiência de desenvolvimento livre de restrições de CORS locais:
 Ideias para futuras versões do projeto:
 
 *   **Deploy Público:** hospedar o backend (ex: Render, Railway ou Fly.io) e o frontend (ex: Vercel, Netlify ou GitHub Pages), disponibilizando um link público do álbum em vez de depender de `localhost`.
+*   **Testes Automatizados:** `pytest` para o endpoint `/figurinhas` do backend, e testes end-to-end (Playwright) cobrindo os fluxos principais do frontend (abrir pacote, persistência de progresso, upload de foto).
+*   **CI no GitHub Actions:** rodar lint e os testes automaticamente a cada push/PR.
+*   **PWA (Progressive Web App):** `manifest.json` + service worker para instalar o álbum como app e permitir uso offline.
+*   **Progresso Sincronizado:** persistir a coleção em um backend com banco de dados (SQLite) e um identificador de usuário, permitindo continuar o álbum em outro dispositivo — hoje o progresso vive só no `localStorage` do navegador.
+*   **Estatísticas por Categoria:** exibir o progresso também por tema (ex: "The Party: 4/6"), além do contador geral.
+*   **Compartilhamento:** gerar uma imagem (via `canvas`) de uma página ou do álbum completo para compartilhar em redes sociais.
+*   **Acessibilidade:** `aria-live` para anunciar figurinhas reveladas, navegação por teclado nos controles de pacote/reset, e revisão de contraste.
+*   **Otimização de Imagens:** converter as imagens de `backend/imgs/` para WebP e aplicar `loading="lazy"` nas figurinhas.
 
 ---
 
